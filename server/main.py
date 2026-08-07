@@ -9,6 +9,10 @@ from pydantic import BaseModel
 from server.models import InterviewRequest, InterviewResponse
 from server.agent import handle_start_interview, handle_conversation_turn
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CANDIDATES_PATH = os.path.join(BASE_DIR, "data", "candidates.json")
+CURRICULUM_PATH = os.path.join(BASE_DIR, "data", "curriculum.json")
+
 app = FastAPI(title="ABTalks AI Interviewer Server")
 
 # Allow CORS for development
@@ -49,7 +53,7 @@ async def interview_endpoint(req: InterviewRequest):
 @app.get("/api/candidates")
 async def get_candidates():
     try:
-        with open("data/candidates.json", "r") as f:
+        with open(CANDIDATES_PATH, "r") as f:
             data = json.load(f)
         return data
     except Exception as e:
@@ -59,7 +63,7 @@ async def get_candidates():
 @app.get("/api/curriculum")
 async def get_curriculum():
     try:
-        with open("data/curriculum.json", "r") as f:
+        with open(CURRICULUM_PATH, "r") as f:
             data = json.load(f)
         return data
     except Exception as e:

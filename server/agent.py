@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CURRICULUM_PATH = os.path.join(BASE_DIR, "data", "curriculum.json")
+
 # Check for API Keys
 def get_llm_provider() -> str:
     """Determine which LLM provider to use based on env variables."""
@@ -318,7 +321,7 @@ sessions_db: Dict[str, InterviewSessionState] = {}
 def load_curriculum_day_details(day_num: int) -> Dict[str, Any]:
     """Loads curriculum details for a specific day from curriculum.json."""
     try:
-        with open("data/curriculum.json", "r") as f:
+        with open(CURRICULUM_PATH, "r") as f:
             data = json.load(f)
         for d in data.get("days", []):
             if d.get("day") == day_num:
