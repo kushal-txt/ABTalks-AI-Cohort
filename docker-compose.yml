@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  interview-agent:
+    build: .
+    container_name: abtalks-interview-agent
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_MODEL=gemini-2.5-flash
+      - OPENAI_MODEL=gpt-4o-mini
+    volumes:
+      # Optional: Mount data directory for persistence or updates
+      - ./data:/app/data
+    restart: unless-stopped
