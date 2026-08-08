@@ -16,6 +16,15 @@ STATIC_PATH = os.path.join(BASE_DIR, "static")
 
 app = FastAPI(title="ABTalks AI Interviewer Server")
 
+# Request logging middleware for Vercel path debugging
+from fastapi import Request
+@app.middleware("http")
+async def log_request(request: Request, call_next):
+    print(f"[Request Log] Method: {request.method} Path: {request.url.path}")
+    response = await call_next(request)
+    print(f"[Response Log] Status: {response.status_code}")
+    return response
+
 # Allow CORS for development
 app.add_middleware(
     CORSMiddleware,
