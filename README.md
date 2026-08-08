@@ -3,7 +3,7 @@
 A premium, state-of-the-art AI Technical Interviewer Agent built for the ABTalks AI Cohort. The agent conducts realistic, candidate-specific, multi-turn technical interviews based on their curriculum progress and outputs structured technical evaluation reports with a final hire verdict.
 
 ## 🚀 Live Demo & Deployment
-- **Production URL**: [https://interview-agent-seven-flame.vercel.app/](https://interview-agent-seven-flame.vercel.app/)
+- **Production URL**: [https://ab-talks-ai-cohort.vercel.app/](https://ab-talks-ai-cohort.vercel.app/)
 - **Vercel Serverless Hosting**: Built using a zero-config Python ASGI entrypoint, caching static assets at the Edge CDN and processing conversation turns via serverless functions.
 
 ---
