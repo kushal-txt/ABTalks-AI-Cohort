@@ -1404,3 +1404,30 @@ body {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Evaluation Decision Badges */
+.decision-badge {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 3px solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+.decision-badge.hire {
+  background-color: var(--emerald);
+  color: #000;
+}
+
+.decision-badge.no-hire {
+  background-color: var(--rose);
+  color: #fff;
+}

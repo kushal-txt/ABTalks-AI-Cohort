@@ -36,6 +36,7 @@ class FeedbackReport(BaseModel):
     strengths: List[str]
     gaps: List[str]
     next: List[str]
+    decision: str
 
 class InterviewResponse(BaseModel):
     reply: str

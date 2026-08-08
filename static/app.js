@@ -440,6 +440,19 @@ function renderFeedbackReport(feedback) {
   document.getElementById('report-avatar').innerText = selectedCandidate.member.name.charAt(0);
   document.getElementById('report-summary-text').innerText = feedback.summary;
   
+  // Set HIRE / NO HIRE decision badge
+  const decisionBadge = document.getElementById('report-decision-badge');
+  if (decisionBadge) {
+    const isHire = feedback.decision && feedback.decision.toUpperCase().includes('HIRE') && !feedback.decision.toUpperCase().includes('NO');
+    if (isHire) {
+      decisionBadge.innerText = 'HIRE';
+      decisionBadge.className = 'decision-badge hire';
+    } else {
+      decisionBadge.innerText = 'NO HIRE';
+      decisionBadge.className = 'decision-badge no-hire';
+    }
+  }
+  
   // Strengths list
   const strengthsList = document.getElementById('report-strengths-list');
   strengthsList.innerHTML = '';

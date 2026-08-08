@@ -503,7 +503,8 @@ def generate_final_feedback(session: InterviewSessionState) -> InterviewResponse
         f"  \"summary\": \"A critical, objective technical summary of the candidate's performance, highlighting exactly where they met the bar and where they failed to demonstrate depth (3-4 sentences).\",\n"
         f"  \"strengths\": [\"Strength 1 (technical and detailed)\", \"Strength 2\", \"Strength 3\"],\n"
         f"  \"gaps\": [\"Technical gap 1 (concrete and critical)\", \"Technical gap 2\", \"Technical gap 3\"],\n"
-        f"  \"next\": [\"Actionable learning recommendation 1\", \"Actionable recommendation 2\"]\n"
+        f"  \"next\": [\"Actionable learning recommendation 1\", \"Actionable recommendation 2\"],\n"
+        f"  \"decision\": \"HIRE\" or \"NO HIRE\" (Must be exactly \"HIRE\" or \"NO HIRE\". Be extremely strict. If the candidate consistently failed to answer technical details, avoided architectural questions, or gave vague textbook definitions, you MUST choose \"NO HIRE\". Only choose \"HIRE\" if the candidate showed outstanding depth, understood trade-offs, and answered the lead architect's hard questions clearly.)\n"
         f"}}\n"
         f"Make sure to output only the raw JSON. Do not write introductory words or surround the response in ```json formatting."
     )
@@ -533,6 +534,7 @@ def generate_final_feedback(session: InterviewSessionState) -> InterviewResponse
                 "Explore evaluation libraries like Ragas or TruLens to build automated testing pipelines.",
                 "Deep dive into QLoRA and weight quantization techniques to optimize local LLM latency."
             ]
+            decision = "HIRE"
         else:
             summary = (
                 f"{candidate_name} showed a solid foundation in the core concepts of the AI Cohort, but would benefit "
@@ -553,8 +555,9 @@ def generate_final_feedback(session: InterviewSessionState) -> InterviewResponse
                 "Review the materials on vector databases and index types (IVF vs. HNSW).",
                 "Practice coding custom context memory sliding window algorithms in Python."
             ]
+            decision = "NO HIRE"
             
-        feedback = FeedbackReport(summary=summary, strengths=strengths, gaps=gaps, next=next)
+        feedback = FeedbackReport(summary=summary, strengths=strengths, gaps=gaps, next=next, decision=decision)
     else:
         # Call the LLM in a single turn using empty history and the compiled user transcript prompt
         raw_resp = call_llm(system_prompt, [], user_prompt, max_tokens=1000)
@@ -568,6 +571,9 @@ def generate_final_feedback(session: InterviewSessionState) -> InterviewResponse
             gaps = ensure_list_of_strings(parsed.get("gaps", []))
             next_steps = ensure_list_of_strings(parsed.get("next", []))
             
+            dec_raw = str(parsed.get("decision", "NO HIRE")).upper()
+            decision = "HIRE" if ("HIRE" in dec_raw and "NO" not in dec_raw) else "NO HIRE"
+            
             # If arrays are empty, provide defaults to meet technical validation thresholds
             if not strengths:
                 strengths = ["Demonstrated comprehension of the daily cohort syllabus."]
@@ -580,7 +586,8 @@ def generate_final_feedback(session: InterviewSessionState) -> InterviewResponse
                 summary=summary,
                 strengths=strengths,
                 gaps=gaps,
-                next=next_steps
+                next=next_steps,
+                decision=decision
             )
         except Exception as e:
             print(f"[Error] Failed parsing LLM feedback: {str(e)}")
@@ -589,7 +596,8 @@ def generate_final_feedback(session: InterviewSessionState) -> InterviewResponse
                 summary=f"Technical interview completed. Note: AI feedback report parsing failed due to raw output formatting: {str(e)}",
                 strengths=["Demonstrated understanding of curriculum objectives."],
                 gaps=["Could improve on structure of technical explanations."],
-                next=["Review curriculum days related to the capstone project."]
+                next=["Review curriculum days related to the capstone project."],
+                decision="NO HIRE"
             )
             
     # Clear the session after interview is complete
