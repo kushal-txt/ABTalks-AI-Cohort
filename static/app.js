@@ -118,6 +118,9 @@ async function checkServerSettings() {
     updateProviderIndicator(settings.active_provider);
     
     // Fill in placeholders if configured
+    if (settings.openrouter_configured) {
+      document.getElementById('openrouter-key').placeholder = '••••••••••••••••••••';
+    }
     if (settings.gemini_configured) {
       document.getElementById('gemini-key').placeholder = '••••••••••••••••••••';
     }
@@ -131,6 +134,7 @@ async function checkServerSettings() {
 
 // Update settings on server
 async function saveSettings() {
+  const openrouterKey = document.getElementById('openrouter-key').value;
   const geminiKey = document.getElementById('gemini-key').value;
   const openaiKey = document.getElementById('openai-key').value;
   
@@ -142,8 +146,9 @@ async function saveSettings() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        gemini_key: geminiKey || null,
-        openai_key: openaiKey || null
+        openrouter_key: openrouterKey === "" ? "" : (openrouterKey || null),
+        gemini_key: geminiKey === "" ? "" : (geminiKey || null),
+        openai_key: openaiKey === "" ? "" : (openaiKey || null)
       })
     });
     
@@ -162,15 +167,18 @@ async function saveSettings() {
 // Update Provider Badges
 function updateProviderIndicator(provider) {
   providerBadge.className = 'status-indicator';
-  if (provider === 'gemini') {
-    providerBadge.classList.add('active-provider');
+  if (provider === 'openrouter') {
+    providerBadge.className = 'status-indicator active-provider';
+    providerLabel.innerText = 'OpenRouter Active';
+  } else if (provider === 'gemini') {
+    providerBadge.className = 'status-indicator active-provider';
     providerLabel.innerText = 'Gemini AI Active';
   } else if (provider === 'openai') {
-    providerBadge.classList.add('active-provider');
+    providerBadge.className = 'status-indicator active-provider';
     providerLabel.innerText = 'OpenAI Active';
   } else {
-    providerBadge.classList.add('mock');
-    providerLabel.innerText = 'Mock Simulator Mode';
+    providerBadge.className = 'status-indicator mock';
+    providerLabel.innerText = 'No Provider Configured (API Key Required)';
   }
 }
 
@@ -511,6 +519,7 @@ function openSettings() {
 function closeSettings() {
   settingsModal.style.display = 'none';
   // Clear keys on close
+  document.getElementById('openrouter-key').value = '';
   document.getElementById('gemini-key').value = '';
   document.getElementById('openai-key').value = '';
 }

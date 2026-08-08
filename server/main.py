@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from server.models import InterviewRequest, InterviewResponse
-from server.agent import handle_start_interview, handle_conversation_turn
+from server.agent import handle_start_interview, handle_conversation_turn, get_llm_provider
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CANDIDATES_PATH = os.path.join(BASE_DIR, "data", "candidates.json")
@@ -83,6 +83,7 @@ async def get_curriculum():
 class SettingsRequest(BaseModel):
     gemini_key: Optional[str] = None
     openai_key: Optional[str] = None
+    openrouter_key: Optional[str] = None
 
 # Settings endpoint to configure/save API keys dynamically
 @app.post("/api/settings")
@@ -99,15 +100,33 @@ async def update_settings(req: SettingsRequest):
                         if len(parts) == 2:
                             env_vars[parts[0].strip()] = parts[1].strip()
         
-        # Apply updates
+        # Apply updates or removals
         if req.gemini_key is not None:
             val = req.gemini_key.strip()
-            env_vars["GEMINI_API_KEY"] = val
-            os.environ["GEMINI_API_KEY"] = val
+            if val == "":
+                env_vars.pop("GEMINI_API_KEY", None)
+                os.environ.pop("GEMINI_API_KEY", None)
+            else:
+                env_vars["GEMINI_API_KEY"] = val
+                os.environ["GEMINI_API_KEY"] = val
+                
         if req.openai_key is not None:
             val = req.openai_key.strip()
-            env_vars["OPENAI_API_KEY"] = val
-            os.environ["OPENAI_API_KEY"] = val
+            if val == "":
+                env_vars.pop("OPENAI_API_KEY", None)
+                os.environ.pop("OPENAI_API_KEY", None)
+            else:
+                env_vars["OPENAI_API_KEY"] = val
+                os.environ["OPENAI_API_KEY"] = val
+                
+        if req.openrouter_key is not None:
+            val = req.openrouter_key.strip()
+            if val == "":
+                env_vars.pop("OPENROUTER_API_KEY", None)
+                os.environ.pop("OPENROUTER_API_KEY", None)
+            else:
+                env_vars["OPENROUTER_API_KEY"] = val
+                os.environ["OPENROUTER_API_KEY"] = val
             
         # Write back all variables to .env
         env_lines = []
@@ -120,7 +139,7 @@ async def update_settings(req: SettingsRequest):
         # Re-import or re-load in agent if necessary (os.environ is shared anyway)
         return {
             "status": "success", 
-            "active_provider": "gemini" if os.getenv("GEMINI_API_KEY") else ("openai" if os.getenv("OPENAI_API_KEY") else "mock")
+            "active_provider": get_llm_provider()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save settings: {str(e)}")
@@ -130,7 +149,8 @@ async def get_settings():
     return {
         "gemini_configured": bool(os.getenv("GEMINI_API_KEY")),
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
-        "active_provider": "gemini" if os.getenv("GEMINI_API_KEY") else ("openai" if os.getenv("OPENAI_API_KEY") else "mock")
+        "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY")),
+        "active_provider": get_llm_provider()
     }
 
 # Mount static files at root (FastAPI will check endpoints first, then static files)

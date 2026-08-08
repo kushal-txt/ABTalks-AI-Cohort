@@ -16,9 +16,13 @@
     <!-- Header -->
     <header class="app-header">
       <div class="logo-area">
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
-        </svg>
+        <div class="logo-box">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
         <div class="logo-text">
           <h1>ABTalks AI Cohort</h1>
           <span class="sub-logo">Interviewer Agent</span>
@@ -277,6 +281,12 @@
           <p class="settings-info">Configure API keys below to enable direct calls to Gemini or OpenAI. By default, the application runs a realistic, state-based Mock simulation tailored to each candidate's cohort files if no API keys are supplied.</p>
           
           <div class="settings-field">
+            <label for="openrouter-key">OpenRouter API Key (Optional Override)</label>
+            <input type="password" id="openrouter-key" placeholder="Enter OPENROUTER_API_KEY">
+            <span class="field-desc">Enables custom models (like Gemini) via OpenRouter.</span>
+          </div>
+          
+          <div class="settings-field">
             <label for="gemini-key">Gemini API Key</label>
             <input type="password" id="gemini-key" placeholder="Enter GEMINI_API_KEY">
             <span class="field-desc">Enables models like <code>gemini-2.5-flash</code>.</span>
@@ -287,6 +297,10 @@
             <input type="password" id="openai-key" placeholder="Enter OPENAI_API_KEY">
             <span class="field-desc">Enables models like <code>gpt-4o-mini</code>.</span>
           </div>
+
+          <p class="settings-safety-note" style="margin-top: 15px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; border-top: 2px dashed var(--border-color); padding-top: 10px;">
+            🛡️ <strong>Security Note:</strong> Keys are stored privately in a secure local config on the server. You can clear your custom key at any time by saving an empty field (useful if default key balances expire).
+          </p>
 
           <div class="settings-actions">
             <button class="modal-btn secondary-btn" id="cancel-settings-btn">Cancel</button>

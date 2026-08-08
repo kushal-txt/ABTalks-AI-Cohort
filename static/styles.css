@@ -103,11 +103,23 @@ body {
   gap: 12px;
 }
 
+.logo-box {
+  background-color: var(--amber);
+  border: 2px solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+  border-radius: 6px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+}
+
 .logo-icon {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   color: var(--primary);
-  animation: float 4s ease-in-out infinite;
 }
 
 .logo-text h1 {
