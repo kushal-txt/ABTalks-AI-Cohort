@@ -12,6 +12,7 @@ from server.agent import handle_start_interview, handle_conversation_turn
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CANDIDATES_PATH = os.path.join(BASE_DIR, "data", "candidates.json")
 CURRICULUM_PATH = os.path.join(BASE_DIR, "data", "curriculum.json")
+STATIC_PATH = os.path.join(BASE_DIR, "static")
 
 app = FastAPI(title="ABTalks AI Interviewer Server")
 
@@ -107,4 +108,4 @@ async def get_settings():
     }
 
 # Mount static files at root (FastAPI will check endpoints first, then static files)
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory=STATIC_PATH, html=True), name="static")
