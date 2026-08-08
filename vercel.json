@@ -1,21 +1,13 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": "data/**"
+      "includeFiles": "data/** && static/**"
     }
   },
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/static/index.html"
-    },
-    {
-      "source": "/styles.css",
-      "destination": "/static/styles.css"
-    },
-    {
-      "source": "/app.js",
-      "destination": "/static/app.js"
+      "source": "/(.*)",
+      "destination": "/api/index.py"
     }
   ]
 }
