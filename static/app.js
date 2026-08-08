@@ -6,6 +6,22 @@ let activeSessionId = null;
 let currentStep = 0;
 let isWaitingForServer = false;
 
+// HTML escaping helper to prevent XSS vulnerabilities
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Escape HTML and format line breaks safely
+function formatMessageText(str) {
+  return escapeHTML(str).replace(/\n/g, '<br>');
+}
+
 // DOM Elements
 const candidatesContainer = document.getElementById('candidates-container');
 const candidateSearchInput = document.getElementById('candidate-search');
@@ -182,13 +198,13 @@ function renderCandidatesList(list) {
     
     card.innerHTML = `
       <div class="card-top">
-        <span class="candidate-name">${candidate.member.name}</span>
-        <span class="cand-id">${candidate.member.id}</span>
+        <span class="candidate-name">${escapeHTML(candidate.member.name)}</span>
+        <span class="cand-id">${escapeHTML(candidate.member.id)}</span>
       </div>
-      <span class="candidate-role">${candidate.member.jobRole}</span>
+      <span class="candidate-role">${escapeHTML(candidate.member.jobRole)}</span>
       <div class="card-meta">
-        <span class="candidate-exp">${candidate.member.yearsExperience} yrs exp</span>
-        <span class="completion-badge ${badgeClass}">${badgeLabel}</span>
+        <span class="candidate-exp">${escapeHTML(candidate.member.yearsExperience)} yrs exp</span>
+        <span class="completion-badge ${badgeClass}">${escapeHTML(badgeLabel)}</span>
       </div>
     `;
     
@@ -405,10 +421,10 @@ function appendMessage(sender, text) {
   const displayName = sender === 'interviewer' ? 'Interviewer Agent' : selectedCandidate.member.name;
   
   wrapper.innerHTML = `
-    <div class="msg-avatar">${initial}</div>
+    <div class="msg-avatar">${escapeHTML(initial)}</div>
     <div class="msg-body">
-      <span class="msg-sender">${displayName}</span>
-      <div class="msg-bubble">${text}</div>
+      <span class="msg-sender">${escapeHTML(displayName)}</span>
+      <div class="msg-bubble">${formatMessageText(text)}</div>
     </div>
   `;
   
@@ -479,7 +495,7 @@ function renderFeedbackReport(feedback) {
     actionCard.className = 'action-card';
     actionCard.innerHTML = `
       <div class="action-num">${index + 1}</div>
-      <div class="action-text">${step}</div>
+      <div class="action-text">${escapeHTML(step)}</div>
     `;
     nextContainer.appendChild(actionCard);
   });

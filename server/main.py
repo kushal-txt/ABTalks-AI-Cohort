@@ -88,14 +88,31 @@ class SettingsRequest(BaseModel):
 @app.post("/api/settings")
 async def update_settings(req: SettingsRequest):
     try:
-        env_lines = []
+        # Load existing env vars to preserve keys not in current request
+        env_vars = {}
+        if os.path.exists(".env"):
+            with open(".env", "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        parts = line.split("=", 1)
+                        if len(parts) == 2:
+                            env_vars[parts[0].strip()] = parts[1].strip()
+        
+        # Apply updates
         if req.gemini_key is not None:
-            # Mask or unmask? We store the actual value.
-            env_lines.append(f"GEMINI_API_KEY={req.gemini_key.strip()}")
-            os.environ["GEMINI_API_KEY"] = req.gemini_key.strip()
+            val = req.gemini_key.strip()
+            env_vars["GEMINI_API_KEY"] = val
+            os.environ["GEMINI_API_KEY"] = val
         if req.openai_key is not None:
-            env_lines.append(f"OPENAI_API_KEY={req.openai_key.strip()}")
-            os.environ["OPENAI_API_KEY"] = req.openai_key.strip()
+            val = req.openai_key.strip()
+            env_vars["OPENAI_API_KEY"] = val
+            os.environ["OPENAI_API_KEY"] = val
+            
+        # Write back all variables to .env
+        env_lines = []
+        for k, v in env_vars.items():
+            env_lines.append(f"{k}={v}")
             
         with open(".env", "w") as f:
             f.write("\n".join(env_lines) + "\n")
@@ -103,7 +120,7 @@ async def update_settings(req: SettingsRequest):
         # Re-import or re-load in agent if necessary (os.environ is shared anyway)
         return {
             "status": "success", 
-            "active_provider": "gemini" if req.gemini_key else ("openai" if req.openai_key else "mock")
+            "active_provider": "gemini" if os.getenv("GEMINI_API_KEY") else ("openai" if os.getenv("OPENAI_API_KEY") else "mock")
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save settings: {str(e)}")

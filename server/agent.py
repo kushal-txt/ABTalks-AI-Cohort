@@ -3,6 +3,7 @@ import json
 import random
 import time
 import requests
+import re
 from typing import Dict, Any, List, Optional
 from server.models import CandidateProfile, FeedbackReport, InterviewResponse
 from server.questions_db import QUESTIONS_DB
@@ -17,11 +18,12 @@ CURRICULUM_PATH = os.path.join(BASE_DIR, "data", "curriculum.json")
 def get_llm_provider() -> str:
     """Determine which LLM provider to use based on env variables."""
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    openrouter_fallback = os.getenv("OPENROUTER_API_KEY_FALLBACK")
     gemini_key = os.getenv("GEMINI_API_KEY")
     openai_key = os.getenv("OPENAI_API_KEY")
     use_ollama = os.getenv("USE_OLLAMA", "").lower() == "true"
     
-    if openrouter_key or os.getenv("OPENROUTER_API_KEY") is None:
+    if openrouter_key or openrouter_fallback:
         return "openrouter"
     elif gemini_key:
         return "gemini"
